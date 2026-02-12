@@ -132,7 +132,12 @@ th{
 <h3>📊 Clasificación</h3>
 <table>
 <thead>
-<tr><th>Nombre</th><th>Puntaje</th></tr>
+<tr>
+  <th>Nombre</th>
+  <th>Puntaje</th>
+  <th>Dígitos</th>
+  <th>Tiempo</th>
+</tr>
 </thead>
 <tbody id="tabla"></tbody>
 </table>
@@ -180,7 +185,7 @@ function nuevaSuma(){
 }
 
 function tiempoDiv(){
-  tiempo.textContent=`⏱️ ${tiempo}`;
+  document.getElementById("tiempo").textContent=`⏱️ ${tiempo}`;
 }
 
 respuesta.addEventListener("keydown",e=>{
@@ -215,13 +220,22 @@ function mostrarResultado(acierto){
 
 function finalizar(){
   suma.textContent="🏁 Examen terminado";
-  tiempo.textContent="";
+  document.getElementById("tiempo").textContent="";
   guardar();
 }
 
 function guardar(){
-  const nombreJugador=nombre.value||"Anónimo";
-  tablaDatos.push({nombre:nombreJugador,puntaje});
+  const nombreJugador = nombre.value || "Anónimo";
+
+  const datos = {
+    nombre: nombreJugador,
+    puntaje: puntaje,
+    digitos: dificultad.value === "10" ? "1" :
+             dificultad.value === "100" ? "2" : "3",
+    tiempoConfig: tiempoLimite.value
+  };
+
+  tablaDatos.push(datos);
   localStorage.setItem("rankingSumas",JSON.stringify(tablaDatos));
   cargarTabla();
 }
@@ -231,7 +245,14 @@ function cargarTabla(){
   tablaDatos
     .sort((a,b)=>b.puntaje-a.puntaje)
     .forEach(j=>{
-      tabla.innerHTML+=`<tr><td>${j.nombre}</td><td>${j.puntaje}</td></tr>`;
+      tabla.innerHTML+=`
+        <tr>
+          <td>${j.nombre}</td>
+          <td>${j.puntaje}</td>
+          <td>${j.digitos || "-"}</td>
+          <td>${j.tiempoConfig ? j.tiempoConfig + "s" : "-"}</td>
+        </tr>
+      `;
     });
 }
 
@@ -243,7 +264,7 @@ function reiniciar(){
   clearInterval(intervalo);
   suma.textContent="";
   resultado.textContent="";
-  tiempo.textContent="";
+  document.getElementById("tiempo").textContent="";
   contador.textContent="";
   puntaje=0;
   pregunta=0;
